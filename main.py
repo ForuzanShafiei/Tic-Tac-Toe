@@ -27,25 +27,40 @@ def get_empty_cells(board):
     return [(row, col) for row in range(3) for col in range(3) if board[row][col] is None]
 
 
+def person_turn(player):
+    if player == "X":
+        choice = int(input(f"It's your turn, select an empty cell (1-9): "))
+    else:
+        choice = int(input(f"It's your friend's turn, select an empty cell (1-9): "))
+        row, col = divmod(choice - 1, 3)
+    return choice
+
+
+def computer_turn(board, player):
+    print("Computer turn.")
+    empty_cells = get_empty_cells(board)
+    row, col = divmod(person_turn() - 1, 3)
+    for cell in empty_cells:
+        board[cell[0]][cell[1]] = player
+        if check_winner(board, player):
+            return cell[0] * 3 + cell[1] + 1
+        board[cell[0]][cell[1]] = None
+
+    return random.choice(empty_cells)[0] * 3 + random.choice(empty_cells)[1] + 1
+
+
 def player_move(board, player, start):
     print_board(board)
-    empty_cells = get_empty_cells(board)
     if not is_board_full(board):
         if start == "c":
             if player == "X":
-                choice = int(input(f"It's your turn, select an empty cell (1-9): "))
-                row, col = divmod(choice - 1, 3)
+                row, col = divmod(person_turn() - 1, 3)
             else:
-                print("Computer turn.")
-                choice = random.choice(empty_cells)
-                row, col = choice
+                choice = computer_turn(board, player)
+                row, col = divmod(choice - 1, 3)
         else:
             if player == "X":
-                choice = int(input(f"It's your turn, select an empty cell (1-9): "))
-                row, col = divmod(choice - 1, 3)
-            else:
-                choice = int(input(f"It's your friend's turn, select an empty cell (1-9): "))
-                row, col = divmod(choice - 1, 3)
+                row, col = divmod(person_turn(player) - 1, 3)
 
         if board[row][col] is None:
             board[row][col] = player
